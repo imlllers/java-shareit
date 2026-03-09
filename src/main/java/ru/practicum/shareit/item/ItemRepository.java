@@ -1,6 +1,6 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Repository
+@Component
 public class ItemRepository {
     private final Map<Integer, Item> items = new HashMap<>();
     private Integer id = 1;

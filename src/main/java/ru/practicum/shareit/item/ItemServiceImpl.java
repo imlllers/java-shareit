@@ -19,12 +19,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     public ItemDto addItem(Integer userId, ItemDto itemDto) {
-        User owner = userRepository.getById(userId);
-
-        if (owner == null) {
-            throw new NotFoundException("Пользователь не найден");
-        }
-
+        User owner = validateUser(userId);
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
         return ItemMapper.toItemDto(itemRepository.add(item));
@@ -32,6 +27,7 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto updateItem(Integer itemId, Integer userId, ItemDto itemDto) {
         Item item = validateItem(itemId);
+        validateUser(userId);
 
         if (!item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Нет доступа для редактирования вещи");
@@ -67,6 +63,16 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.find(text).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    private User validateUser(Integer userId) {
+        User user = userRepository.getById(userId);
+
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+
+        return user;
     }
 
     private Item validateItem(Integer id) {

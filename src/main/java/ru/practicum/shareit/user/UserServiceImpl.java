@@ -17,13 +17,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.toUser(userDto);
-        boolean uniqueEmail = userRepository.getAll().stream()
-                .anyMatch(u -> u.getEmail().equals(user.getEmail()));
-
-        if (uniqueEmail) {
-            throw new ConflictException("Email занят");
-        }
-
+        validateEmail(user.getEmail(), null);
         return UserMapper.toUserDto(userRepository.create(user));
     }
 

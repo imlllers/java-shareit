@@ -1,11 +1,11 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
-@Repository
+@Component
 public class UserRepository {
     private final Map<Integer, User> users = new HashMap<>();
     private Integer id = 1;
