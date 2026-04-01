@@ -9,7 +9,9 @@ import ru.practicum.shareit.user.model.User;
 
 @Entity
 @Table(name = "items", schema = "public")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
