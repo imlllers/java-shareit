@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.comment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -6,13 +6,13 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class ItemRequestDto {
+public class CommentDto {
     private Long id;
 
     @NotBlank
-    private String description;
+    private String text;
 
-    private Long requestorId;
+    private String authorName;
 
     private LocalDateTime created;
 }
