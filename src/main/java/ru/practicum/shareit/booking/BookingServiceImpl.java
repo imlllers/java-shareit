@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -27,6 +28,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final Sort newestFirst = Sort.by(Sort.Direction.DESC, "start");
 
     @Override
     public BookingDto createBooking(Long userId, BookingDto bookingDto) {
@@ -109,10 +111,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateBookingDates(BookingDto bookingDto) {
-        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new IllegalArgumentException("Даты бронирования должны быть указаны");
-        }
-
         if (!bookingDto.getEnd().isAfter(bookingDto.getStart())) {
             throw new IllegalArgumentException("Дата окончания должна быть позже даты начала");
         }
@@ -121,24 +119,24 @@ public class BookingServiceImpl implements BookingService {
     private List<Booking> getBookingsForBooker(Long userId, BookingState state) {
         LocalDateTime now = LocalDateTime.now();
         return switch (state) {
-            case ALL -> bookingRepository.findByBookerIdOrderByStartDesc(userId);
-            case CURRENT -> bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
-            case PAST -> bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, now);
-            case FUTURE -> bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, now);
-            case WAITING -> bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
-            case REJECTED -> bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+            case ALL -> bookingRepository.findByBookerId(userId, newestFirst);
+            case CURRENT -> bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(userId, now, now, newestFirst);
+            case PAST -> bookingRepository.findByBookerIdAndEndBefore(userId, now, newestFirst);
+            case FUTURE -> bookingRepository.findByBookerIdAndStartAfter(userId, now, newestFirst);
+            case WAITING -> bookingRepository.findByBookerIdAndStatus(userId, Status.WAITING, newestFirst);
+            case REJECTED -> bookingRepository.findByBookerIdAndStatus(userId, Status.REJECTED, newestFirst);
         };
     }
 
     private List<Booking> getBookingsForOwner(Long userId, BookingState state) {
         LocalDateTime now = LocalDateTime.now();
         return switch (state) {
-            case ALL -> bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
-            case CURRENT -> bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now);
-            case PAST -> bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, now);
-            case FUTURE -> bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(userId, now);
-            case WAITING -> bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
-            case REJECTED -> bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+            case ALL -> bookingRepository.findByItemOwnerId(userId, newestFirst);
+            case CURRENT -> bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfter(userId, now, now, newestFirst);
+            case PAST -> bookingRepository.findByItemOwnerIdAndEndBefore(userId, now, newestFirst);
+            case FUTURE -> bookingRepository.findByItemOwnerIdAndStartAfter(userId, now, newestFirst);
+            case WAITING -> bookingRepository.findByItemOwnerIdAndStatus(userId, Status.WAITING, newestFirst);
+            case REJECTED -> bookingRepository.findByItemOwnerIdAndStatus(userId, Status.REJECTED, newestFirst);
         };
     }
 }

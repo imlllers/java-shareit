@@ -10,7 +10,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -20,13 +19,12 @@ import java.time.LocalDateTime;
 @Table(name = "comments", schema = "public")
 @Getter
 @Setter
-@ToString
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "text", nullable = false)
+    @Column(name = "text", nullable = false, length = 512)
     private String text;
 
     @ManyToOne

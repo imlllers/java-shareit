@@ -36,11 +36,9 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRequestRepository itemRequestRepository;
 
     @Override
-    public ru.practicum.shareit.item.dto.ItemDto addItem(Long userId, ru.practicum.shareit.item.dto.ItemDto itemDto) {
+    public ItemDto addItem(Long userId, ItemDto itemDto) {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-
-        validateItem(itemDto);
 
         Item item = ItemMapper.toItem(itemDto);
         item.setOwner(owner);
@@ -50,7 +48,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ru.practicum.shareit.item.dto.ItemDto updateItem(Long itemId, Long userId, ru.practicum.shareit.item.dto.ItemDto itemDto) {
+    public ItemDto updateItem(Long itemId, Long userId, ItemDto itemDto) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
@@ -102,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ru.practicum.shareit.item.dto.ItemDto> findItems(String text) {
+    public Collection<ItemDto> findItems(String text) {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }
@@ -114,10 +112,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto addComment(Long itemId, Long userId, CommentDto commentDto) {
-        if (commentDto.getText() == null || commentDto.getText().isBlank()) {
-            throw new IllegalArgumentException("Текст комментария не может быть пустым");
-        }
-
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
@@ -141,20 +135,6 @@ public class ItemServiceImpl implements ItemService {
         comment.setCreated(LocalDateTime.now());
 
         return CommentMapper.toCommentDto(commentRepository.save(comment));
-    }
-
-    private void validateItem(ru.practicum.shareit.item.dto.ItemDto itemDto) {
-        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
-            throw new IllegalArgumentException("Название вещи не может быть пустым");
-        }
-
-        if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
-            throw new IllegalArgumentException("Описание вещи не может быть пустым");
-        }
-
-        if (itemDto.getAvailable() == null) {
-            throw new IllegalArgumentException("Статус доступности вещи должен быть указан");
-        }
     }
 
     private void attachRequest(Item item, Long requestId) {
