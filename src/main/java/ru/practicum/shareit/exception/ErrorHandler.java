@@ -20,15 +20,15 @@ public class ErrorHandler {
         return new ErrorResponse("Конфликт", e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidation(MethodArgumentNotValidException e) {
+    public ErrorResponse handleValidation(Exception e) {
         return new ErrorResponse("Ошибка валидации", e.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleForbidden(MethodArgumentNotValidException e) {
+    public ErrorResponse handleForbidden(ForbiddenException e) {
         return new ErrorResponse("Нет прав доступа", e.getMessage());
     }
 }
